@@ -106,14 +106,16 @@ def _nixpkgs_package_impl(repository_ctx):
     repository = repository_ctx.attr.repository
     repositories = repository_ctx.attr.repositories
 
+    nix_file = repository_ctx.attr.nix_file
+
     # Is nix supported on this platform?
     not_supported = not _is_supported_platform(repository_ctx)
 
     # Should we fail if Nix is not supported?
     fail_not_supported = repository_ctx.attr.fail_not_supported
 
-    if repository and repositories or not repository and not repositories:
-        fail("Specify one of 'repository' or 'repositories' (but not both).")
+    if (repository and repositories or not repository and not repositories) and not nix_file:
+        fail("Specify one of 'repository', 'repositories' or 'nix_file' (but not multiple).")
     elif repository:
         repositories = {repository_ctx.attr.repository: "nixpkgs"}
 
@@ -155,7 +157,7 @@ def _nixpkgs_package_impl(repository_ctx):
 
     expr_args.extend([
         "-A",
-        repository_ctx.attr.attribute_path if repository_ctx.attr.nix_file or repository_ctx.attr.nix_file_content else repository_ctx.attr.attribute_path or repository_ctx.attr.name,
+        repository_ctx.attr.attribute_path or repository_ctx.attr.name,
         # Creating an out link prevents nix from garbage collecting the store path.
         # nixpkgs uses `nix-support/` for such house-keeping files, so we mirror them
         # and use `bazel-support/`, under the assumption that no nix package has
