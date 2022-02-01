@@ -155,9 +155,11 @@ def _nixpkgs_package_impl(repository_ctx):
     for dep in repository_ctx.attr.nix_file_deps:
         nix_file_deps[dep] = _cp(repository_ctx, dep)
 
+    attr_path = repository_ctx.attr.attribute_path if repository_ctx.attr.nix_file or repository_ctx.attr.nix_file_content else repository_ctx.attr.attribute_path or repository_ctx.attr.name
+    if attr_path:
+        expr_args.extend(["-A", attr_path])
+
     expr_args.extend([
-        "-A",
-        repository_ctx.attr.attribute_path or repository_ctx.attr.name,
         # Creating an out link prevents nix from garbage collecting the store path.
         # nixpkgs uses `nix-support/` for such house-keeping files, so we mirror them
         # and use `bazel-support/`, under the assumption that no nix package has
