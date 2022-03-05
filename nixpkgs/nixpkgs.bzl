@@ -1365,7 +1365,10 @@ toolchain(
 )
     """.format(
         workspace = repository_ctx.attr.workspace,
-        os = {"darwin": "osx"}.get(cpu, "linux"),
+        os = {
+            "darwin": "osx",
+            "darwin_arm64": "osx",
+        }.get(cpu, "linux"),
     ))
 
 _nixpkgs_sh_posix_toolchain = repository_rule(
