@@ -1349,6 +1349,7 @@ create_posix_toolchain()
 
 def _nixpkgs_sh_posix_toolchain_impl(repository_ctx):
     cpu = get_cpu_value(repository_ctx)
+    print("XXX {}".format(cpu))
     repository_ctx.file("BUILD", executable = False, content = """
 toolchain(
     name = "nixpkgs_sh_posix_toolchain",
