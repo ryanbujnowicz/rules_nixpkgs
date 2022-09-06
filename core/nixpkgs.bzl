@@ -131,6 +131,8 @@ def _nixpkgs_package_impl(repository_ctx):
     repository = repository_ctx.attr.repository
     repositories = repository_ctx.attr.repositories
 
+    nix_file = repository_ctx.attr.nix_file
+
     expr_args = []
 
     strFailureImplicitNixpkgs = (
@@ -138,8 +140,8 @@ def _nixpkgs_package_impl(repository_ctx):
         "The NIX_PATH environment variable is not inherited."
     )
 
-    if repository and repositories or not repository and not repositories:
-        fail("Specify one of 'repository' or 'repositories' (but not both).")
+    if (repository and repositories or not repository and not repositories) and not nix_file:
+        fail("Specify one of 'repository', 'repositories' or 'nix_file' (but not multiple).")
     elif repository:
         repositories = {repository_ctx.attr.repository: "nixpkgs"}
 
@@ -220,9 +222,11 @@ def _nixpkgs_package_impl(repository_ctx):
     for dep in repository_ctx.attr.nix_file_deps:
         nix_file_deps[dep] = cp(repository_ctx, dep)
 
+    attr_path = repository_ctx.attr.attribute_path if repository_ctx.attr.nix_file or repository_ctx.attr.nix_file_content else repository_ctx.attr.attribute_path or repository_ctx.attr.name
+    if attr_path:
+        expr_args.extend(["-A", attr_path])
+
     expr_args.extend([
-        "-A",
-        repository_ctx.attr.attribute_path if repository_ctx.attr.nix_file or repository_ctx.attr.nix_file_content else repository_ctx.attr.attribute_path or repository_ctx.attr.name,
         # Creating an out link prevents nix from garbage collecting the store path.
         # nixpkgs uses `nix-support/` for such house-keeping files, so we mirror them
         # and use `bazel-support/`, under the assumption that no nix package has

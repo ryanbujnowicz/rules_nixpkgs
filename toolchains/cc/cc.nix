@@ -1,8 +1,5 @@
-let
-  pkgs = import <nixpkgs> { config = { }; overlays = [ ]; };
-in
-
-{ ccType
+{ pkgs ? import <nixpkgs> { config = {}; overlays = []; }
+, ccType
 , ccAttrPath ? null
 , ccAttrSet ? null
 , ccExpr ? null
