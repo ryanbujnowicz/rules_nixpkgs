@@ -1,0 +1,51 @@
+# NOTE: temporary boilerplate for compatibility with `WORKSPACE` setup!
+# TODO: remove when migration to `bzlmod` is complete
+
+### generic dependencies for rendering documentation
+
+local_repository(
+    name = "io_tweag_rules_nixpkgs",
+    path = "../..",
+)
+
+load("@io_tweag_rules_nixpkgs//nixpkgs:repositories.bzl", "rules_nixpkgs_dependencies")
+
+rules_nixpkgs_dependencies(toolchains = ['cc', 'java', 'posix'])
+
+load("@rules_nixpkgs_core//docs:dependencies_1.bzl", "docs_dependencies_1")
+
+docs_dependencies_1()
+
+load("@rules_nixpkgs_core//docs:dependencies_2.bzl", "docs_dependencies_2")
+
+docs_dependencies_2()
+
+### end generic dependencies for rendering documentation
+
+### dependencies for tests
+
+load("//:python.bzl", "nixpkgs_python_configure")
+
+nixpkgs_python_configure(
+    python2_attribute_path = "python2",
+    repository = "@nixpkgs",  # `@nixpkgs` reused from `docs_dependencies_2`
+)
+
+load("@rules_nixpkgs_core//:nixpkgs.bzl", "nixpkgs_package")
+
+nixpkgs_package(
+    name = "nixpkgs_python_configure_test",
+    nix_file = "//tests:python-test.nix",
+    repository = "@nixpkgs",
+)
+
+# The interpreter_test rule creates a repository with a generated test.py file.
+# It takes a target label for a python interpreter, which we load from defs.bzl
+# in the python toolchain repository. The generated test.py file is run by the
+# //tests:resolve-interpreter test target. It checks the resolved interpreter
+# label matches the sys.executable path.
+load("//tests:interpreter-test.bzl", "interpreter_test")
+load("@nixpkgs_python_toolchain//:defs.bzl", "interpreter")
+interpreter_test(name = "interpreter_test", interpreter_label = interpreter)
+
+### end dependencies for tests

@@ -7,15 +7,12 @@ local_repository(
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # https://bazelbuild.github.io/rules_rust/#setup
-revision = "dc66c1612b7a3e96531eff22136570124c8eec81"
-
 http_archive(
     name = "rules_rust",
-    sha256 = "9dadbcd1136f7d4f3f2e7c0790531be0fdcccc535dec42a4c5a6f2df7380e3e3",
-    strip_prefix = "rules_rust-{}".format(revision),
+    sha256 = "7453856d239a004c9e29cde2e45903a068446e4a69501ee7393faf08e1a30403",
     urls = [
-        # `main` branch as of 2021-12-01
-        "https://github.com/bazelbuild/rules_rust/archive/{}.tar.gz".format(revision),
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_rust/releases/download/0.1.0/rules_rust-v0.1.0.tar.gz",
+        "https://github.com/bazelbuild/rules_rust/releases/download/0.1.0/rules_rust-v0.1.0.tar.gz",
     ],
 )
 
@@ -27,8 +24,8 @@ load("@io_tweag_rules_nixpkgs//nixpkgs:nixpkgs.bzl", "nixpkgs_git_repository")
 
 nixpkgs_git_repository(
     name = "nixpkgs",
-    revision = "21.11",
-    sha256 = "c77bb41cf5dd82f4718fa789d49363f512bb6fa6bc25f8d60902fe2d698ed7cc",
+    revision = "22.05",
+    sha256 = "0f8c25433a6611fa5664797cd049c80faefec91575718794c701f3b033f2db01",
 )
 
 # rules_rust also uses the cc compiler
